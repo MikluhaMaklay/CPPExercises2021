@@ -34,8 +34,7 @@ TEST(lesson01, fib10) {
 }
 
 TEST(lesson01, fib100) {
-//    fibbonachiRecursive(100); // TODO 05 обратите внимание что рекурсивный Фибоначчи очень медленный, переделайте его на быстрый вариант, замените его здесь и убедитесь что стало быстрее
-//    fibbonachiFast(100);
+    fibbonachiFast(100);
 }
 
 TEST(lesson01, findX1) {
@@ -68,7 +67,6 @@ TEST(lesson01, findX6) {
     GTEST_ASSERT_EQ(x, -1.5);
 }
 
-// TODO 21 добавьте много тестов которые проверят работу поиска квадратных корней для всех случаев
 TEST(lesson01, solveSquare1) {
     // 0*x^2 + 4*x - 6 = 0
     std::vector<double> xs = solveSquare(0.0, 4.0, -6.0);
