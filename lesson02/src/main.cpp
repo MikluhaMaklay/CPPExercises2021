@@ -98,7 +98,7 @@ void task3() {
         for (int m = 0; m < rows; m++){
             isRowed = true;
             for (int n = 0; n < cols; n++){
-                if (matrix[m][n] < 1) isRowed = false;
+                if (matrix[m][n] != 1) isRowed = false;
             }
             if (isRowed) {
                 std::cout << "OX-XO-XO";
@@ -111,7 +111,7 @@ void task3() {
             for (int m = 0; m < cols; m++){
                 isCols = true;
                 for (int n = 0; n < rows; n++){
-                    if (matrix[n][m] < 1) isCols = false;
+                    if (matrix[n][m] != 1) isCols = false;
                 }
                 if (isCols) {
                     std::cout << "AX-XA-XA";
