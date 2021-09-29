@@ -9,3 +9,9 @@ cv::Mat invertImageColors(cv::Mat image);
 cv::Mat addBackgroundInsteadOfBlackPixels(cv::Mat object, cv::Mat background);
 
 cv::Mat addBackgroundInsteadOfBlackPixelsLargeBackground(cv::Mat object, cv::Mat largeBackground);
+
+cv::Mat drawManyTimes(cv::Mat object, cv::Mat background, int n);
+
+cv::Mat unicornUpscale(cv::Mat object, cv::Mat background);
+
+cv::Mat epilepsy(cv::Mat image);

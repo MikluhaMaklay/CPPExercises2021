@@ -1,6 +1,7 @@
 #include "helper_functions.h"
 
 #include <libutils/rasserts.h>
+#include <iostream>
 
 
 cv::Mat makeAllBlackPixelsBlue(cv::Mat image) {
@@ -52,7 +53,6 @@ cv::Mat invertImageColors(cv::Mat image) {
 }
 
 cv::Mat addBackgroundInsteadOfBlackPixels(cv::Mat object, cv::Mat background) {
-    // TODO реализуйте функцию которая все черные пиксели картинки-объекта заменяет на пиксели с картинки-фона
     // т.е. что-то вроде накладного фона получится
 
     // гарантируется что размеры картинок совпадают - проверьте это через rassert, вот например сверка ширины:
@@ -74,8 +74,93 @@ cv::Mat addBackgroundInsteadOfBlackPixels(cv::Mat object, cv::Mat background) {
 
 cv::Mat addBackgroundInsteadOfBlackPixelsLargeBackground(cv::Mat object, cv::Mat largeBackground) {
     // теперь вам гарантируется что largeBackground гораздо больше - добавьте проверок этого инварианта (rassert-ов)
+    rassert(object.cols < largeBackground.cols, 397928346)
+    rassert(object.rows < largeBackground.rows, 32473984619)
 
-    // TODO реализуйте функцию так, чтобы нарисовался объект ровно по центру на данном фоне, при этом черные пиксели объекта не должны быть нарисованы
+    for (int rows = 0; rows < object.rows; rows++){
+        for (int cols = 0; cols < object.cols; cols++){
+            cv::Vec3b color = object.at<cv::Vec3b>(rows, cols); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
+
+            if (color != cv::Vec3b(0, 0, 0)){
+                largeBackground.at<cv::Vec3b>(largeBackground.rows / 2 - object.rows / 2 + rows, largeBackground.cols / 2 - object.cols / 2 + cols) = object.at<cv::Vec3b>(rows, cols);
+            }
+        }
+    }
 
     return largeBackground;
+}
+
+cv::Mat drawManyTimes(cv::Mat object, cv::Mat background, int n) {
+    n = rand() % 100;
+
+    for (int i = 0; i < n; i++){
+        int x = rand() % (background.rows - object.rows);
+        int y = rand() % (background.cols - object.cols);
+
+
+        for (int rows = 0; rows < object.rows; rows++){
+            for (int cols = 0; cols < object.cols; cols++){
+                cv::Vec3b color = object.at<cv::Vec3b>(rows, cols); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
+
+                if (color != cv::Vec3b(0, 0, 0)){
+                    background.at<cv::Vec3b>(x + rows, y + cols) = object.at<cv::Vec3b>(rows, cols);
+                }
+            }
+        }
+    }
+
+    return background;
+
+}
+
+cv::Mat unicornUpscale(cv::Mat object, cv::Mat background){
+
+    cv::Mat newImage(591, 591, CV_8UC3, cv::Scalar(256,56,0));
+
+    for (int rows = 0; rows < newImage.rows; rows++){
+        for (int cols = 0; cols < newImage.cols; cols++){
+            int y = rows*1.0 / newImage.rows * object.rows;
+            int x = cols*1.0 / newImage.cols * object.cols;
+
+            newImage.at<cv::Vec3b>(rows, cols) = object.at<cv::Vec3b>(y, x);
+
+            cv::Vec3b color = newImage.at<cv::Vec3b>(rows, cols); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
+
+            if (color != cv::Vec3b(0, 0, 0)){
+                background.at<cv::Vec3b>(rows, background.cols / 2 - newImage.cols / 2 + cols) = newImage.at<cv::Vec3b>(rows, cols);
+            }
+
+        }
+    }
+
+    return background;
+}
+
+cv::Mat epilepsy(cv::Mat lastImage){
+    cv::Mat image(591, 591, CV_8UC3, cv::Scalar(256,56,0));
+
+
+    for (int rows = 0; rows < image.rows; rows++){
+        for (int cols = 0; cols < image.cols; cols++){
+            int y = rows*1.0 / image.rows * lastImage.rows;
+            int x = cols*1.0 / image.cols * lastImage.cols;
+
+            image.at<cv::Vec3b>(rows, cols) = lastImage.at<cv::Vec3b>(y, x);
+
+
+            cv::Vec3b color = image.at<cv::Vec3b>(rows, cols); // взяли и узнали что за цвет в пикселе в 14-ом ряду (т.к. индексация с нуля) и 6-ой колонке
+
+            int R = rand() % 256;
+            int G = rand() % 256;
+            int B = rand() % 256;
+
+
+            if (color == cv::Vec3b(0, 0, 0)){
+                image.at<cv::Vec3b>(rows, cols) = cv::Vec3b(B, G, R);
+            }
+        }
+    }
+
+
+    return image;
 }
