@@ -195,10 +195,13 @@ cv::Mat makeBackgroundDisappear(cv::Mat firstImage, cv::Mat background, MyVideoC
 
             unsigned char blueFrame = frameColor[0];
 
+
+
             int differenceBetweenColors = 30;
 
             if (abs(redBackground - redFrame) < differenceBetweenColors && abs(greenBackground - greenFrame) < differenceBetweenColors && abs(blueBackground - blueFrame) < differenceBetweenColors){
                 content.frame.at<cv::Vec3b>(rows, cols) = background.at<cv::Vec3b>(rows, cols);
+
             }
         }
     }
@@ -207,7 +210,7 @@ cv::Mat makeBackgroundDisappear(cv::Mat firstImage, cv::Mat background, MyVideoC
 }
 
 void task4() {
-    cv::VideoCapture video(1);
+    cv::VideoCapture video(0);
 
     rassert(video.isOpened(), 3423948392481)
 
@@ -262,9 +265,6 @@ void task4() {
 
 
 
-    // TODO подумайте, а как бы отмаскировать фон целиком несмотря на то что он разноцветный?
-    // а как бы вы справились с тем чтобы из фотографии с единорогом и фоном удалить фон зная как выглядит фон?
-    // а может сделать тот же трюк с вебкой - выйти из вебки в момент запуска программы, и первый кадр использовать как кадр-эталон с фоном который надо удалять (делать прозрачным)
 }
 
 
