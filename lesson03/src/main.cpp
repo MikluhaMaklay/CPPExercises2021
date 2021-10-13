@@ -209,8 +209,22 @@ cv::Mat makeBackgroundDisappear(cv::Mat firstImage, cv::Mat background, MyVideoC
     return content.frame;
 }
 
+cv::Mat dilate(cv::Mat image, int radius){
+    for (int rows = 0; rows < image.rows; rows++){
+        for (int cols = 0; cols < image.cols; cols++){
+            for (int i = 0; i < radius; i++){
+                for (int j = 0; j < radius; j++){
+
+                }
+            }
+        }
+    }
+
+    return image;
+}
+
 void task4() {
-    cv::VideoCapture video(0);
+    cv::VideoCapture video(1);
 
     rassert(video.isOpened(), 3423948392481)
 
@@ -275,6 +289,7 @@ int main() {
 //        task2();
 //        task3();
         task4();
+
         return 0;
     } catch (const std::exception &e) {
         std::cout << "Exception! " << e.what() << std::endl;

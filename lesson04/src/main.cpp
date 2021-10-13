@@ -7,7 +7,6 @@
 
 #include <opencv2/highgui.hpp>
 
-// TODO 100 реализуйте систему непересекающихся множеств - см. файлы disjoint_set.h и disjoint_set.cpp
 // чтобы их потестировать - постарайтесь дописать сюда много разных интересных случаев:
 void testingMyDisjointSets() {
     DisjointSet set(5);
@@ -18,9 +17,37 @@ void testingMyDisjointSets() {
 
     }
 
-    // TODO 100 по мере реализации DisjointSet - добавьте здесь каких-то вызовов операции "объединение двух множеств", сразу после этого проверяя через rassert что после этого результат такой как вы ожидаете
-    // TODO 100 затем попробуйте создать СНМ размера 10.000.000 - и пообъединяйте какие-нибудь элементы (в цикле), быстро ли работает? а если при подвешивании одного корня множества к другому мы не будем учитывать ранк (высоту дерева) - как быстро будет работать?
-    // TODO 100 попробуйте скомпилировать программу с оптимизациями и посмотреть ускорится ли программа - File->Settings->CMake->Плюсик над Debug->и переключите его в RelWithDebInfo (чтобы были хоть какие-то отладочные символы)
+    rassert(set.union_sets(1, 2) == 1, 23872936)
+    rassert(set.union_sets(1, 3) == 1, 294730247)
+    rassert(set.get_set(3) == 1, 395862397)
+    rassert(set.count_differents() == 3, 234349)
+    rassert(set.get_set_size(1) == 3, 2638754)
+}
+
+struct MyVideoContent {
+    cv::Mat frame;
+    std::vector<std::vector<int>> clicks = {{}, {}};
+    bool isInverted = false;
+    cv::Vec3b currentColor;
+    cv::Mat background;
+};
+
+cv::Mat largeCastleUpscale(cv::Mat image, MyVideoContent content){
+    cv::Mat newImage(content.frame.rows, content.frame.cols, CV_8UC3, cv::Scalar(256,56,0));
+
+    std::cout << content.frame.rows << " " << content.frame.cols;
+    rassert(!newImage.empty(), 3829694326)
+
+    for (int rows = 0; rows < newImage.rows; rows++){
+        for (int cols = 0; cols < newImage.cols; cols++){
+            int y = rows*1.0 / newImage.rows * image.rows;
+            int x = cols*1.0 / newImage.cols * image.cols;
+
+            newImage.at<cv::Vec3b>(rows, cols) = image.at<cv::Vec3b>(y, x);
+        }
+    }
+
+    return newImage;
 }
 
 // TODO 200 перенесите сюда основную часть кода из прошлого задания про вычитание фона по первому кадру, но:
@@ -36,12 +63,53 @@ void testingMyDisjointSets() {
 // 5) попробуйте добавить настройку параметров морфологии и СНМ по нажатию кнопок (и выводите их значения в консоль)
 void backgroundMagickStreaming() {
 
+    cv::VideoCapture video(1);
+
+    rassert(video.isOpened(), 3423948392481)
+
+    MyVideoContent content;
+
+    std::string resultsDir = "lesson04/resultsData/";
+    if (!std::filesystem::exists(resultsDir)) { // если папка еще не создана
+        std::filesystem::create_directory(resultsDir); // то создаем ее
+    }
+
+    cv::Mat castle = cv::imread("lesson03/data/castle_large.jpg");
+
+    rassert(!castle.empty(), 3573290865)
+
+    video.read(content.frame);
+
+    cv::Mat largeCastle = largeCastleUpscale(castle, content);
+
+    rassert(!largeCastle.empty(), 8237489369265)
+
+    video.read(content.background);
+
+    std::string filename = resultsDir + "background";
+    cv::imwrite(filename, content.background);
+
+    while(video.isOpened()){
+        bool isSuccess = video.read(content.frame);
+        rassert(isSuccess, 348792347819);
+        rassert(!content.frame.empty(), 3452314124643)
+
+        makeBackgroundDisappear(content.background, largeCastle, content);
+
+        cv::imshow("video", content.frame);
+
+        int key = cv::waitKey(10);
+        if (key == 32 || key == 27) break;
+    }
+
+
+
 }
 
 int main() {
     try {
-        testingMyDisjointSets();
-//        backgroundMagickStreaming();
+//        testingMyDisjointSets();
+        backgroundMagickStreaming();
         return 0;
     } catch (const std::exception &e) {
         std::cout << "Exception! " << e.what() << std::endl;
