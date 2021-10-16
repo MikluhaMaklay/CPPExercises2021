@@ -49,19 +49,19 @@ int main() {
     try {
         testBGRToGray();
 
-//        for (int i = 1; i <= 4; ++i) {
-//            testSobel("line0" + std::to_string(i));
-//        }
+        for (int i = 1; i <= 4; ++i) {
+            testSobel("line0" + std::to_string(i));
+        }
+
+        for (int i = 1; i <= 4; ++i) {
+            testSobel("line1" + std::to_string(i));
+        }
+
+        testSobel("line21_water_horizont");
+        testSobel("multiline1_paper_on_table");
+        testSobel("multiline2_paper_on_table");
 //
-//        for (int i = 1; i <= 4; ++i) {
-//            // TODO сделайте вызов тестирования картинок line11.jpg - line14.jpg
-//        }
-//
-//        testSobel("line21_water_horizont");
-//        testSobel("multiline1_paper_on_table");
-//        testSobel("multiline2_paper_on_table");
-//
-//        testSobel("valve");
+        testSobel("valve");
         return 0;
     } catch (const std::exception &e) {
         std::cout << "Exception! " << e.what() << std::endl;
