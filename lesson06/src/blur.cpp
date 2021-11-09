@@ -9,7 +9,7 @@ cv::Mat blur(cv::Mat img, double sigma, int radius) {
 
     for (int rows = 0; rows < weights.rows; rows++){
         for (int cols = 0; cols < weights.cols; cols++){
-            weights.at<double>(rows, cols) = G(rows - radius, cols - radius, sigma);
+            weights.at<float>(rows, cols) = G(rows - radius, cols - radius, sigma);
         }
     }
 
@@ -24,7 +24,7 @@ cv::Mat blur(cv::Mat img, double sigma, int radius) {
                     if (i + rows < 0 || i + rows >= res.rows || j + cols < 0 || j + cols >= res.cols)
                         continue;
 
-                    double weight  = weights.at<double>(i + radius, j + radius);
+                    double weight  = weights.at<float>(i + radius, j + radius);
                     cv::Vec3b current = img.at<cv::Vec3b>(i + rows, j + cols);
                     value = current * weight;
                     sum += weight;

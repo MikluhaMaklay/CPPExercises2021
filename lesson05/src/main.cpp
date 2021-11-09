@@ -57,6 +57,12 @@ int main() {
             testSobel("line1" + std::to_string(i));
         }
 
+        testSobel("old-pieces-of-paper_23-2147782974");
+        testSobel("scale_1200");
+        testSobel("1417016568_72");
+        testSobel("ny-state-of-liberty");
+        testSobel("Cosas-que-debes-de-pasar-antes-de-decir-te-amo-8");
+
         testSobel("line21_water_horizont");
         testSobel("multiline1_paper_on_table");
         testSobel("multiline2_paper_on_table");
