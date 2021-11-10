@@ -20,8 +20,8 @@ cv::Mat buildHough(cv::Mat sobel) {// единственный аргумент 
     // так же известна как пространство Хафа
     cv::Mat accumulator(max_r, max_theta, CV_32FC1);
 
-    for(int i = 0; i < height; i++){
-        for (int j = 0; j < width; j++){
+    for(int i = 0; i < max_r; i++){
+        for (int j = 0; j < max_theta; j++){
             rassert(accumulator.type() == CV_32FC1, 2636363562483);
             accumulator.at<float>(i, j) = 0.0;
         }
@@ -38,7 +38,7 @@ cv::Mat buildHough(cv::Mat sobel) {// единственный аргумент 
 
             // теперь для текущего пикселя надо найти все возможные прямые которые через него проходят
             // переберем параметр theta по всему возможному диапазону (в градусах):
-            for (int theta0 = 0; theta0 < max_theta; ++theta0) {
+            for (int theta0 = 0; theta0 < max_theta / 2; ++theta0) {
                 // TODO рассчитайте на базе информации о том какие координаты у пикселя - (x0, y0) и какой параметр theta0 мы сейчас рассматриваем
                 // TODO обратите внимание что функции sin/cos принимают углы в радианах, поэтому сначала нужно пересчитать theta0 в радианы (воспользуйтесь константой PI)
                 const double PI = 3.14159265358979323846264338327950288;
@@ -63,11 +63,14 @@ cv::Mat buildHough(cv::Mat sobel) {// единственный аргумент 
                 rassert(accumulator.type() == CV_32FC1, 2636363562483);
                 // TODO и добавьте в картинку-аккумулятор наш голос с весом strength (взятый из картинки свернутой Собелем)
 
+                float before = accumulator.at<float>(j, i);
+                rassert(strength >= 0, 3865982658)
                 accumulator.at<float>(j, i) += strength;
+                rassert(accumulator.at<float>(j, i) >= 0, 9375826)
 
-                if (accumulator.at<float>(j, i) < 0){
-                    std::cout << "dkshf";
-                }
+//                if (accumulator.at<float>(j, i) < 0){
+//                    std::cout << "dkshf";
+//                }
             }
         }
     }
