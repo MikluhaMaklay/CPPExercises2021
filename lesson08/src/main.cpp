@@ -40,7 +40,6 @@ void test(std::string name) {
     }
     cv::imwrite("lesson08/resultsData/" + name + "_1_sobel_strength.png", sobel_strength);
 
-    // TODO
     // Эта функция по картинке с силами градиентов (после свертки оператором Собеля) строит пространство Хафа
     // Вы можете либо взять свою реализацию из прошлого задания, либо взять мою заготовку которая предложена внутри этой функции
     // и довести ее до ума
@@ -55,6 +54,20 @@ void test(std::string name) {
         }
     }
 
+    cv::Mat blurredHough;
+    int blurX = 5; // ширина сглаживания - по оси X
+    int blurY = blurX * hough.rows / hough.cols;
+    if (blurY % 2 == 0) {
+        blurY = blurY + 1;
+    }
+    if (blurY < blurX) {
+        blurY = blurX;
+    }    cv::blur(hough, blurredHough, cv::Size(blurX, blurY)); // сглаживаем пространство Хафа (сглаженный результат в blurredHough)
+    hough = blurredHough; // заменяем сырое пространство Хафа на сглаженное
+// и сохраянем его визуализацию на диск:
+    cv::imwrite("lesson08/resultsData/" + name + "_3_hough_blurred.png", hough*255.0f/max_accumulated);
+
+
     // заменим каждый пиксель с яркости X на яркость X*255.0f/max_accumulated (т.е. уменьшим диапазон значений)
     cv::imwrite("lesson08/resultsData/" + name + "_2_hough_normalized.png", hough*255.0f/max_accumulated);
 
@@ -64,8 +77,8 @@ void test(std::string name) {
     std::vector<PolarLineExtremum> lines = findLocalExtremums(hough);
 
 // TODO реализуйте фильтрацию прямых - нужно оставлять только те прямые, у кого много голосов (реализуйте функцию filterStrongLines(...) ):
-//    double thresholdFromWinner = 0.5; // хотим оставить только те прямые у кого не менее половины голосов по сравнению с самой популярной прямой
-//    lines = filterStrongLines(lines, thresholdFromWinner);
+    double thresholdFromWinner = 0.5; // хотим оставить только те прямые у кого не менее половины голосов по сравнению с самой популярной прямой
+    lines = filterStrongLines(lines, thresholdFromWinner, hough.rows);
 
     std::cout << "Found " << lines.size() << " extremums:" << std::endl;
     for (int i = 0; i < lines.size(); ++i) {
@@ -78,19 +91,19 @@ int main() {
     try {
         test("line01");
 
-//        test("line02");
+        test("line02");
 
-//        test("line11");
+        test("line11");
 
-//        test("line12");
+        test("line12");
 
-//        test("line21_water_horizont");
+        test("line21_water_horizont");
 
-//        test("multiline1_paper_on_table");
+        test("multiline1_paper_on_table");
 
-//        test("multiline2_paper_on_table");
+        test("multiline2_paper_on_table");
 
-//        test("valve");
+        test("valve");
 
         return 0;
     } catch (const std::exception &e) {
