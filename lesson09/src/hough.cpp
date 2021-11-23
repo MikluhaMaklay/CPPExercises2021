@@ -250,15 +250,16 @@ cv::Mat drawLinesOnImage(cv::Mat img, std::vector<PolarLineExtremum> lines)
         PolarLineExtremum topImageBorder(90, 0, 0);
 
         // TODO воспользуйтесь недавно созданной функций поиска пересечения прямых чтобы найти точки пересечения краев картинки:
-//        if (line.theta >= 45 && line.theta <= 135 || line.theta >= 180 && l)
-//        {
+        if (line.theta >= 45 && line.theta <= 135 || line.theta >= 180 && line.theta <= 270)
+        {
             pointA = line.intersect(leftImageBorder);
             pointB = line.intersect(rightImageBorder);
-//        }
+        }
         // TODO а в каких случаях нужно использовать пересечение с верхним и нижним краем картинки?
-//        pointA = line.intersect(???);
-//        pointB = line.intersect(???);
-
+        if (line.theta > 270 && line.theta <= 360 || line.theta >= 0 && line.theta < 45  || line.theta >= 135 && line.theta <= 180) {
+            pointA = line.intersect(topImageBorder);
+            pointB = line.intersect(bottomImageBorder);
+        }
         // TODO переделайте так чтобы цвет для каждой прямой был случайным (чтобы легче было различать близко расположенные прямые)
         cv::Scalar color(rand() % 256, rand() % 256, rand() % 256);
         cv::line(imgWithLines, pointA, pointB, color);
