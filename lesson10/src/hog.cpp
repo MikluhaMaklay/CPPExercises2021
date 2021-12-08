@@ -36,7 +36,7 @@ HoG buildHoG(cv::Mat grad_x, cv::Mat grad_y) {
 
             if (strength < 10) // пропускайте слабые градиенты, это нужно чтобы игнорировать артефакты сжатия в jpeg (например в line01.jpg пиксели не идеально белые/черные, есть небольшие отклонения)
                 continue;
-            float theta = atan2(dx, dy);
+            float theta = atan2(dy, dx);
 
 
             // TODO рассчитайте в какую корзину нужно внести голос
