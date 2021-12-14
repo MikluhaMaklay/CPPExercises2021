@@ -3,14 +3,16 @@
 #include <libutils/rasserts.h>
 
 #include "parseSymbols.h"
+#include "../../lesson10/src/hog.h"
 
 #include <opencv2/imgproc.hpp>
-
+#define LETTER_DIR_PATH std::string("lesson10/generatedData/letters")
 
 cv::Scalar randColor() {
     return cv::Scalar(128 + rand() % 128, 128 + rand() % 128, 128 + rand() % 128); // можно было бы брать по модулю 255, но так цвета будут светлее и контрастнее
 }
 
+std::vector<cv::Rect> boxes;
 
 cv::Mat drawContours(int rows, int cols, std::vector<std::vector<cv::Point>> contoursPoints) {
 
@@ -20,17 +22,17 @@ cv::Mat drawContours(int rows, int cols, std::vector<std::vector<cv::Point>> con
     cv::Mat blackImage(rows, cols, CV_8UC3, cv::Scalar(0, 0, 0));
     // теперь мы на ней хотим нарисовать контуры
     cv::Mat imageWithContoursPoints = blackImage.clone();
-//    for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
-//        // сейчас мы смотрим на контур номер contourI
-//
-//        cv::Scalar contourColor = randColor(); // выберем для него случайный цвет
-//        std::vector<cv::Point> points = contoursPoints[???]; // TODO 06 вытащите вектор из точек-пикселей соответствующих текущему контуру который мы хотим нарисовать
-//        for (int i = 0; ???) { // TODO 06 пробегите по всем точкам-пикселям этого контура
-//            cv::Point point = ???; // TODO 06 и взяв очередную точку-пиксель - нарисуйте выбранный цвет в этом пикселе картинки:
-//            imageWithContoursPoints.at<cv::Vec3b>(point.y, point.x) = cv::Vec3b(contourColor[0], contourColor[1], contourColor[2]);
-//        }
-//
-//    }
+    for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
+        // сейчас мы смотрим на контур номер contourI
+
+        cv::Scalar contourColor = randColor(); // выберем для него случайный цвет
+        std::vector<cv::Point> points = contoursPoints[contourI]; // TODO 06 вытащите вектор из точек-пикселей соответствующих текущему контуру который мы хотим нарисовать
+        for (int i = 0; i < points.size(); ++i) { // TODO 06 пробегите по всем точкам-пикселям этого контура
+            cv::Point point = points[i]; // TODO 06 и взяв очередную точку-пиксель - нарисуйте выбранный цвет в этом пикселе картинки:
+            imageWithContoursPoints.at<cv::Vec3b>(point.y, point.x) = cv::Vec3b(contourColor[0], contourColor[1], contourColor[2]);
+        }
+
+    }
 
     return imageWithContoursPoints;
 }
@@ -61,16 +63,16 @@ void test(std::string name, std::string k) {
 
     // TODO 01 выполните бинарный трешолдинг картинки, прочитайте документацию по функции cv::threshold и выберите значения аргументов
     cv::Mat binary;
-    cv::threshold(img, binary, 128, 255, cv::THRESH_BINARY);
+    cv::threshold(img, binary, 128, 255, cv::THRESH_BINARY_INV);
     cv::imwrite(out_path + "/02_binary_thresholding.jpg", binary);
 
     // TODO 02 выполните адаптивный бинарный трешолдинг картинки, прочитайте документацию по cv::adaptiveThreshold
-    cv::adaptiveThreshold(img, binary, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY, 5, 10);
+    cv::adaptiveThreshold(img, binary, 255, cv::ADAPTIVE_THRESH_MEAN_C, cv::THRESH_BINARY_INV, 51, 10);
     cv::imwrite(out_path + "/03_adaptive_thresholding.jpg", binary);
 
     // TODO 03 чтобы буквы не разваливались на кусочки - морфологическое расширение (эрозия)
     cv::Mat binary_eroded;
-    cv::erode(binary, binary_eroded, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(4, 4)));
+    cv::erode(binary, binary_eroded, cv::getStructuringElement(cv::MORPH_RECT, cv::Size(1, 1)));
     cv::imwrite(out_path + "/04_erode.jpg", binary_eroded);
 
     // TODO 03 заодно давайте посмотрим что делает морфологическое сужение (диляция)
@@ -103,24 +105,47 @@ void test(std::string name, std::string k) {
     cv::imwrite(out_path + "/07_contours_points2.jpg", imageWithContoursPoints2);
 
     // TODO 06 наконец давайте посмотрим какие буковки нашлись - обрамим их прямоугольниками
-//    cv::Mat imgWithBoxes = original.clone();
-//    for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
-//        std::vector<cv::Point> points = contoursPoints[contourI]; // перем очередной контур
-//        cv::Rect box = cv::boundingRect(points); // строим прямоугольник по всем пикселям контура (bounding box = бокс ограничивающий объект)
-//        cv::Scalar blackColor(0, 0, 0);
-//        // TODO прочитайте документацию cv::rectangle чтобы нарисовать прямоугольник box с толщиной 2 и черным цветом (обратите внимание какие есть поля у box)
-//        cv::rectangle(imgWithBoxes, ???, ???, ???, ???);
-//    }
-//    cv::imwrite(out_path + "/08_boxes.jpg", imgWithBoxes); // TODO если вдруг у вас в картинке странный результат
-//                                                           // например если нет прямоугольников - посмотрите в верхний левый пиксель - белый ли он?
-//                                                           // если не белый, то что это значит? почему так? сколько в целом нашлось связных компонент?
+    cv::Mat imgWithBoxes = original.clone();
+    for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
+        std::vector<cv::Point> points = contoursPoints[contourI]; // перем очередной контур
+        cv::Rect box = cv::boundingRect(points); // строим прямоугольник по всем пикселям контура (bounding box = бокс ограничивающий объект)
+        boxes.push_back(box);
+        cv::Scalar blackColor(0, 0, 0);
+        // TODO прочитайте документацию cv::rectangle чтобы нарисовать прямоугольник box с толщиной 2 и черным цветом (обратите внимание какие есть поля у box)
+        cv::rectangle(imgWithBoxes, box.tl(), box.br(), blackColor, 2);
+    }
+    cv::imwrite(out_path + "/08_boxes.jpg", imgWithBoxes); // TODO если вдруг у вас в картинке странный результат
+                                                           // например если нет прямоугольников - посмотрите в верхний левый пиксель - белый ли он?
+                                                           // если не белый, то что это значит? почему так? сколько в целом нашлось связных компонент?
 }
 
 void finalExperiment(std::string name, std::string k) {
     // TODO 100:
+    std::vector<cv::Mat> symbols = splitSymbols(cv::imread("lesson11/resultsData/" + name + "/" + k), boxes);
     // 1) вытащите результат которым вы довольны в функцию splitSymbols в parseSymbols.h/parseSymbols.cpp
     //    эта функция должна находить контуры букв и извлекать кусочки картинок в вектор
     // 2) классифицируйте каждую из вытащенных букв (результатом из прошлого задания) и выведите полученный текст в консоль
+
+
+
+
+        for(const auto& a: symbols){
+        char letterMin = 'a';
+        double distMin = DBL_MAX;
+        for (char letterB = 'a'; letterB <= 'z'; ++letterB) {
+            cv::Mat b = cv::imread( LETTER_DIR_PATH + "/" + letterB + "/1.png");
+            HoG hogA = buildHoG(a);
+            HoG hogB = buildHoG(b);
+
+            double dist = distance(hogA, hogB);
+            if (dist < distMin){
+                distMin = dist;
+                letterMin = letterB;
+            }
+        }
+        std::cout << letterMin << std::endl;
+    }
+
 }
 
 
@@ -129,17 +154,19 @@ int main() {
         test("alphabet", "3_gradient");
 
         // TODO 50: обязательно получите результат на других картинках - прямо в цикле все их обработайте:
-//        std::vector<std::string> names;
-//        names.push_back("alphabet");
-//        names.push_back("line");
-//        names.push_back("text");
-//        for (int i = 0; i < names.size(); ++i) {
-//            for (int j = 1; j <= 5; ++j) {
-//                test(names[i], std::to_string(j));
-//            }
-//        }
+        std::vector<std::string> names;
+        names.push_back("alphabet");
+        names.push_back("line");
+        names.push_back("text");
+        for (int i = 0; i < names.size(); ++i) {
+            for (int j = 1; j <= 5; ++j) {
+                test(names[i], std::to_string(j));
+            }
+        }
 
-        //test("alphabet", "3_gradient");
+        test("alphabet", "3_gradient");
+
+        finalExperiment("text", "1");
 
         return 0;
     } catch (const std::exception &e) {

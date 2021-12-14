@@ -41,6 +41,8 @@ HoG buildHoG(cv::Mat grad_x, cv::Mat grad_y) {
 
             // TODO рассчитайте в какую корзину нужно внести голос
             int bin = (M_PI + theta) / (2 * M_PI) * 8; // что-то странное, но норм
+            if(bin == 8)
+                bin = 0;
 
             if(bin == 8) bin = 0;
 
