@@ -3,7 +3,7 @@
 #include <libutils/rasserts.h>
 
 #include "parseSymbols.h"
-#include "../../lesson10/src/hog.h"
+#include "hog.h"
 
 #include <opencv2/imgproc.hpp>
 #define LETTER_DIR_PATH std::string("lesson10/generatedData/letters")
@@ -127,9 +127,8 @@ void finalExperiment(std::string name, std::string k) {
     // 2) классифицируйте каждую из вытащенных букв (результатом из прошлого задания) и выведите полученный текст в консоль
 
 
-
-
-        for(const auto& a: symbols){
+    for(const auto& a: symbols){
+        std::cout << "huuui";
         char letterMin = 'a';
         double distMin = DBL_MAX;
         for (char letterB = 'a'; letterB <= 'z'; ++letterB) {
@@ -151,20 +150,20 @@ void finalExperiment(std::string name, std::string k) {
 
 int main() {
     try {
-        test("alphabet", "3_gradient");
+//        test("alphabet", "3_gradient");
+//
+//        // TODO 50: обязательно получите результат на других картинках - прямо в цикле все их обработайте:
+//        std::vector<std::string> names;
+//        names.push_back("alphabet");
+//        names.push_back("line");
+//        names.push_back("text");
+//        for (int i = 0; i < names.size(); ++i) {
+//            for (int j = 1; j <= 5; ++j) {
+//                test(names[i], std::to_string(j));
+//            }
+//        }
 
-        // TODO 50: обязательно получите результат на других картинках - прямо в цикле все их обработайте:
-        std::vector<std::string> names;
-        names.push_back("alphabet");
-        names.push_back("line");
-        names.push_back("text");
-        for (int i = 0; i < names.size(); ++i) {
-            for (int j = 1; j <= 5; ++j) {
-                test(names[i], std::to_string(j));
-            }
-        }
-
-        test("alphabet", "3_gradient");
+//        test("alphabet", "3_gradient");
 
         finalExperiment("text", "1");
 
