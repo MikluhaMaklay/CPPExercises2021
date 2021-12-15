@@ -12,8 +12,6 @@ cv::Scalar randColor() {
     return cv::Scalar(128 + rand() % 128, 128 + rand() % 128, 128 + rand() % 128); // можно было бы брать по модулю 255, но так цвета будут светлее и контрастнее
 }
 
-std::vector<cv::Rect> boxes;
-
 cv::Mat drawContours(int rows, int cols, std::vector<std::vector<cv::Point>> contoursPoints) {
 
     // TODO 06 реализуйте функцию которая покажет вам как выглядят найденные контура:
@@ -109,7 +107,6 @@ void test(std::string name, std::string k) {
     for (int contourI = 0; contourI < contoursPoints.size(); ++contourI) {
         std::vector<cv::Point> points = contoursPoints[contourI]; // перем очередной контур
         cv::Rect box = cv::boundingRect(points); // строим прямоугольник по всем пикселям контура (bounding box = бокс ограничивающий объект)
-        boxes.push_back(box);
         cv::Scalar blackColor(0, 0, 0);
         // TODO прочитайте документацию cv::rectangle чтобы нарисовать прямоугольник box с толщиной 2 и черным цветом (обратите внимание какие есть поля у box)
         cv::rectangle(imgWithBoxes, box.tl(), box.br(), blackColor, 2);
@@ -121,14 +118,16 @@ void test(std::string name, std::string k) {
 
 void finalExperiment(std::string name, std::string k) {
     // TODO 100:
-    std::vector<cv::Mat> symbols = splitSymbols(cv::imread("lesson11/resultsData/" + name + "/" + k), boxes);
+    std::vector<cv::Mat> symbols = splitSymbols(cv::imread("lesson11/data/" + name + "/" + k + ".png"));
     // 1) вытащите результат которым вы довольны в функцию splitSymbols в parseSymbols.h/parseSymbols.cpp
     //    эта функция должна находить контуры букв и извлекать кусочки картинок в вектор
     // 2) классифицируйте каждую из вытащенных букв (результатом из прошлого задания) и выведите полученный текст в консоль
-
+    for(int i = 0; i < symbols.size(); i++){
+        rassert(!symbols[i].empty(), 3748963246293486984)
+        cv::imwrite("lesson11/resultsData/finalText/" + std::to_string(i) + ".jpg", symbols[i]);
+    }
 
     for(const auto& a: symbols){
-        std::cout << "huuui";
         char letterMin = 'a';
         double distMin = DBL_MAX;
         for (char letterB = 'a'; letterB <= 'z'; ++letterB) {
@@ -162,7 +161,7 @@ int main() {
 //                test(names[i], std::to_string(j));
 //            }
 //        }
-
+//
 //        test("alphabet", "3_gradient");
 
         finalExperiment("text", "1");

@@ -4,4 +4,4 @@
 
 #include <vector>
 
-std::vector<cv::Mat> splitSymbols(cv::Mat img, std::vector<cv::Rect> boxes);
+std::vector<cv::Mat> splitSymbols(cv::Mat img);
