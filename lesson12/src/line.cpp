@@ -6,6 +6,10 @@
 
 #include <random>
 
+double Line::getDist(const cv::Point2f& p) const{
+    return pow(a*p.x + b*p.y + c, 2)/(a*a + b*b);
+}
+
 double Line::getYFromX(double x)
 {
     rassert(b != 0.0, 2734832748932790061); // случай вертикальной прямой не рассматривается для простоты
@@ -119,13 +123,26 @@ Line fitLineFromTwoPoints(cv::Point2f a, cv::Point2f b)
 
 Line fitLineFromNPoints(std::vector<cv::Point2f> points)
 {
+
+    double minDist = DBL_MAX;
+    Line resultLine = fitLineFromTwoPoints(points[0], points[1]);
     for(int i = 0; i < points.size(); i++){
         for(int j = 0; j < points.size(); j++){
-
+            if(points[i] == points[j])
+                continue;
+            Line line = fitLineFromTwoPoints(points[i], points[j]);
+            double dist = 0;
+            for(auto & point : points){
+                dist += line.getDist(point);
+            }
+            if(minDist > dist) {
+                minDist = dist;
+                resultLine = line;
+            }
         }
     }
     // TODO 05 реализуйте построение прямой по многим точкам (такое чтобы прямая как можно лучше учитывала все точки)
-    return Line(0.0, -1.0, 2.0);
+    return resultLine;
 }
 
 Line fitLineFromNNoisyPoints(std::vector<cv::Point2f> points)
