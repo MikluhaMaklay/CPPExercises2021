@@ -108,6 +108,8 @@ void Line::plot(cv::Mat &img, double scale, cv::Scalar color)
 
 Line fitLineFromTwoPoints(cv::Point2f a, cv::Point2f b)
 {
+    if(a.x == b.x)
+        return Line(4,5,5);
     rassert(a.x != b.x, 23892813901800104); // для упрощения можно считать что у нас не бывает вертикальной прямой
 
 
@@ -145,10 +147,35 @@ Line fitLineFromNPoints(std::vector<cv::Point2f> points)
     return resultLine;
 }
 
-Line fitLineFromNNoisyPoints(std::vector<cv::Point2f> points)
+Line fitLineFromNNoisyPoints(std::vector<cv::Point2f> points, int k)
 {
+    int rad = 10;
+    int bestVotes = 0;
+    Line bestLine = fitLineFromTwoPoints(points[0], points[1]);
+    for(int i = 0; i < pow(1 / k, 2); i++){
+        cv::Point a;
+        cv::Point b = a;
+        while(a == b) {
+            int aInd = rand() % points.size();
+            int bInd = rand() % points.size();
+            a = points[aInd];
+            b = points[bInd];
+        }
+        Line line = fitLineFromTwoPoints(a, b);
+        int votes = 0;
+        for(auto point: points){
+            if (line.getDist(point) <= rad){
+                votes++;
+            }
+        }
+        if(bestVotes < votes){
+            bestVotes = votes;
+            bestLine = line;
+        }
+
+    }
     // TODO 06 БОНУС - реализуйте построение прямой по многим точкам включающим нерелевантные (такое чтобы прямая как можно лучше учитывала НАИБОЛЬШЕЕ число точек)
-    return Line(0.0, -1.0, 2.0);
+    return bestLine;
 }
 
 std::vector<cv::Point2f> generateRandomPoints(int n,

@@ -31,6 +31,6 @@ Line fitLineFromTwoPoints(cv::Point2f a, cv::Point2f b);
 
 Line fitLineFromNPoints(std::vector<cv::Point2f> points);
 
-Line fitLineFromNNoisyPoints(std::vector<cv::Point2f> points);
+Line fitLineFromNNoisyPoints(std::vector<cv::Point2f> points, int k);
 
 std::ostream& operator << (std::ostream& os, const Line& line);
