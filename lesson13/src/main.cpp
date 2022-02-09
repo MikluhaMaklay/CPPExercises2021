@@ -146,7 +146,6 @@ void test1() {
     std::vector<double> distances;
     for (int i = 0; i < matches01.size(); ++i) {
         distances.push_back(matches01[i][0].distance);
-//            distances.push_back(matches01[i][1].distance);
     }
     std::sort(distances.begin(), distances.end());
     for (int i = 0; i < keypoints0.size(); ++i) {
