@@ -58,21 +58,22 @@ void run() {
     const int INF = std::numeric_limits<int>::max();
 
     std::vector<int> distances(nvertices, INF);
-    // TODO ...
+    distances[0] = 0;
+    std::vector<bool> used(nvertices, false);
+    used[0] = true;
+    while (true) {
 
-//    while (true) {
-//
-//    }
+    }
 
-//    if (...) {
-//        ...
-//        for (...) {
-//            std::cout << (path[i] + 1) << " ";
-//        }
-//        std::cout << std::endl;
-//    } else {
-//        std::cout << -1 << std::endl;
-//    }
+    if (...) {
+        ...
+        for (...) {
+            std::cout << (path[i] + 1) << " ";
+        }
+        std::cout << std::endl;
+    } else {
+        std::cout << -1 << std::endl;
+    }
 }
 
 int main() {
