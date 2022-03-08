@@ -8,6 +8,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/core/types.hpp>
+#include <set>
 
 
 struct Edge {
@@ -46,7 +47,7 @@ void run(int mazeNumber) {
     rassert(maze.type() == CV_8UC3, 3447928472389020);
     std::cout << "Maze resolution: " << maze.cols << "x" << maze.rows << std::endl;
 
-    int nvertices = 0; // TODO
+    int nvertices = maze.cols * maze.rows; // TODO
 
     std::vector<std::vector<Edge>> edges_by_vertex(nvertices);
     for (int j = 0; j < maze.rows; ++j) {
@@ -79,6 +80,34 @@ void run(int mazeNumber) {
     cv::Mat window = maze.clone(); // на этой картинке будем визуализировать до куда сейчас дошла прокладка маршрута
 
     std::vector<int> distances(nvertices, INF);
+    distances[start] = 0;
+    std::vector<int> parents(nvertices, -1);
+    parents[start] = start;
+    std::set<std::pair<long long, int>> queue;
+    queue.emplace(0, start);
+
+    while (!queue.empty()) {
+        auto p = *queue.begin();
+        queue.erase(*queue.begin());
+
+        if(distances[p.second] != p.first)
+            continue;
+
+        for(auto i: edges_by_vertex[p.second]){
+            if(distances[i.v] > p.first + i.w){
+                distances[i.v] = p.first + i.w;
+                queue.emplace(distances[i.v], i.v);
+                parents[i.v] = p.second;
+
+            }
+        }
+        cv::Point2i point = decodeVertex(p.first, maze.rows, maze.cols);
+            window.at<cv::Vec3b>(point.y, point.x) = cv::Vec3b(0, 255, 0);
+            cv::imshow("Maze", window);
+            cv::waitKey(1);
+    }
+
+
     // TODO СКОПИРУЙТЕ СЮДА ДЕЙКСТРУ ИЗ ПРЕДЫДУЩЕГО ИСХОДНИКА
 
     // TODO в момент когда вершина становится обработанной - красьте ее на картинке window в зеленый цвет и показывайте картинку:
