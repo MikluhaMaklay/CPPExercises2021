@@ -59,10 +59,9 @@ void run() {
     const int INF = std::numeric_limits<int>::max();
 
     std::vector<int> distances(nvertices, INF);
-    std::vector<int> parents(nvertices, -1);
     distances[start] = 0;
-//    std::vector<bool> used(nvertices, false);
-//    used[0] = true;
+    std::vector<int> parents(nvertices, -1);
+    parents[start] = start;
     std::set<std::pair<long long, int>> queue;
     queue.emplace(0, start);
 
@@ -98,41 +97,6 @@ void run() {
     } else {
         std::cout << -1 << std::endl;
     }
-
-    ///
-//    std::vector<ll> distances(nvertices, INF);
-//    std::vector<int> prev(nvertices, -1);
-//    std::set<std::pair<ll, int>> q;        //w, u
-//    distances[start] = 0;
-//    prev[start] = start;
-//    q.emplace(0, start);
-//    while (!q.empty()){
-//        auto p = *q.begin();
-//        q.erase(*q.begin());
-//        if(distances[p.second] != p.first)
-//            continue;
-//        for(auto n : edges_by_vertex[p.second]){
-//            if(distances[n.v] > p.first+n.w){
-//                distances[n.v] = p.first+n.w;
-//                q.emplace(distances[n.v], n.v);
-//                prev[n.v] = p.second;
-//            }
-//        }
-//    }
-//
-//    if (distances[finish] != INF) {
-//        std::vector<int> path;
-//        for (int i = finish; prev[i] != i; i = prev[i]) {
-//            path.emplace_back(i + 1);
-//        }
-//        path.emplace_back(start+1);
-//        for(auto it = path.rbegin(); it != path.rend(); it++)
-//            std::cout << *it << " ";
-//        std::cout << "\n";
-//    } else {
-//        std::cout << -1 << "\n";
-//    }
-
 }
 
 int main() {
