@@ -21,7 +21,7 @@ bool isPixelMasked(cv::Mat mask, int j, int i) {
     rassert(mask.type() == CV_8UC3, 2348732984792380019);
 
     // TODO проверьте белый ли пиксель
-    return false;
+    return mask.at<cv::Vec3b>(j, i) == cv::Vec3b(255,255,255);
 }
 
 void run(int caseNumber, std::string caseName) {
@@ -31,10 +31,11 @@ void run(int caseNumber, std::string caseName) {
     cv::Mat mask = cv::imread("lesson18/data/" + std::to_string(caseNumber) + "_" + caseName + "/" + std::to_string(caseNumber) + "_mask.png");
     rassert(!original.empty(), 324789374290018);
     rassert(!mask.empty(), 378957298420019);
+    rassert(original.size == mask.size, 282389216392)
 
     // TODO напишите rassert сверяющий разрешение картинки и маски
     // TODO выведите в консоль это разрешение картинки
-    // std::cout << "Image resolution: " << ... << std::endl;
+     std::cout << "Image resolution: " << original.size << std::endl;
 
     // создаем папку в которую будем сохранять результаты - lesson18/resultsData/ИМЯ_НАБОРА/
     std::string resultsDir = "lesson18/resultsData/";
@@ -55,6 +56,27 @@ void run(int caseNumber, std::string caseName) {
     // TODO посчитайте и выведите число отмаскированных пикселей (числом и в процентах) - в таком формате:
     // Number of masked pixels: 7899/544850 = 1%
 
+    int numberOfMasked = 0;
+    cv::Mat originalCleaned = original.clone();
+    for (int j = 0; j < original.rows; j++){
+        for (int i = 0; i < original.cols; i++){
+            if (isPixelMasked(mask, j, i)){
+                originalCleaned.at<cv::Vec3b>(j, i) = cv::Vec3b(255, 255, 255);
+                numberOfMasked++;
+            }
+        }
+    }
+    cv::imwrite(resultsDir + "2_original_cleaned.png", originalCleaned);
+
+    {
+        int numberOfPixels = original.cols * original.rows;
+        int percentage = numberOfMasked * 100 / numberOfPixels;
+        std::cout << "Number of masked pixels: " + std::to_string(numberOfMasked) + "/" + std::to_string(numberOfPixels) + " = " + std::to_string(percentage) + "%" + '\n';
+    }
+
+
+
+
     FastRandom random(32542341); // этот объект поможет вам генерировать случайные гипотезы
 
     // TODO 10 создайте картинку хранящую относительные смещения - откуда брать донора для заплатки, см. подсказки про то как с нею работать на сайте
@@ -63,19 +85,24 @@ void run(int caseNumber, std::string caseName) {
     // TODO 13 сохраните получившуюся картинку на диск
     // TODO 14 выполняйте эти шаги 11-13 много раз, например 1000 раз (оберните просто в цикл, сохраняйте картинку на диск только на каждой десятой или сотой итерации)
     // TODO 15 теперь давайте заменять значение относительного смещения на новой только если новая случайная гипотеза - лучше старой, добавьте оценку "насколько смещенный патч 5х5 похож на патч вокруг пикселя если их наложить"
-    //
+
     // Ориентировочный псевдокод-подсказка получившегося алгоритма:
-    // cv::Mat shifts(...); // матрица хранящая смещения, изначально заполнена парами нулей
-    // cv::Mat image = original; // текущая картинка
-    // for (100 раз) {
-    //     for (пробегаем по всем пикселям j,i) {
-    //         if (если этот пиксель не отмаскирован)
-    //             continue; // пропускаем т.к. его менять не надо
-    //         cv::Vec2i dxy = смотрим какое сейчас смещение для этого пикселя в матрице смещения
-    //         int (nx, ny) = (i + dxy.x, j + dxy.y); // ЭТО НЕ КОРРЕКТНЫЙ КОД, но он иллюстрирует как рассчитать координаты пикселя-донора из которого мы хотим брать цвет
-    //         currentQuality = estimateQuality(image, j, i, ny, nx, 5, 5); // эта функция (создайте ее) считает насколько похож квадрат 5х5 приложенный центром к (i, j)
-    //                                                                                                                        на квадрат 5х5 приложенный центром к (nx, ny)
-    //
+     cv::Mat shifts(original.rows, original.cols, CV_32SC2); // матрица хранящая смещения, изначально заполнена парами нулей
+     cv::Mat image = original; // текущая картинка
+     for (int n = 0; n < 100; n++) {
+         for (int j = 0; j < image.rows; j++) {
+             for(int i = 0; i < image.cols; i++){
+                 if (isPixelMasked(mask, j, i))
+                              continue; // пропускаем т.к. его менять не надо
+                 cv::Vec2i dxy = shifts.at<cv::Vec2i>(j, i);
+                 int (nx, ny) = (i + dxy.x, j + dxy.y); // ЭТО НЕ КОРРЕКТНЫЙ КОД, но он иллюстрирует как рассчитать координаты пикселя-донора из которого мы хотим брать цвет
+                 currentQuality = estimateQuality(image, j, i, ny, nx, 5, 5); // эта функция (создайте ее) считает насколько похож квадрат 5х5 приложенный центром к (i, j)
+                                                                                                                                         // на квадрат 5х5 приложенный центром к (nx, ny)
+
+             }
+         }
+     }
+
     //         int (rx, ry) = random.... // создаем случайное смещение относительно нашего пикселя, воспользуйтесь функцией random.next(...);
     //                                      (окрестность вокруг пикселя на который укажет смещение - не должна выходить за пределы картинки и не должна быть отмаскирована)
     //         randomQuality = estimateQuality(image, j, i, j+ry, i+rx, 5, 5); // оцениваем насколько похоже будет если мы приложим эту случайную гипотезу которую только что выбрали
