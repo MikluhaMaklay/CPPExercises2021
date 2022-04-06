@@ -108,13 +108,13 @@ void run(int caseNumber, std::string caseName) {
     // Ориентировочный псевдокод-подсказка получившегося алгоритма:
      cv::Mat shifts(original.rows, original.cols, CV_32SC2); // матрица хранящая смещения, изначально заполнена парами нулей
      cv::Mat image = original; // текущая картинка
-     for (int n = 0; n <= 100; n++) {
+     for (int n = 0; n <= 1000; n++) {
          for (int j = 0; j < image.rows; j++) {
              for(int i = 0; i < image.cols; i++){
                  if (!isPixelMasked(mask, j, i))
                               continue; // пропускаем т.к. его менять не надо
-                 cv::Vec2i dxy = shifts.at<cv::Vec2i>(j, i);
-                 cv::Point donor = cv::Point(i + dxy[1], j + dxy[0]);
+                 cv::Vec2i dyx = shifts.at<cv::Vec2i>(j, i);
+                 cv::Point donor = cv::Point(i + dyx[1], j + dyx[0]);
 //                 int (nx, ny) = (i + dxy.x, j + dxy.y); // ЭТО НЕ КОРРЕКТНЫЙ КОД, но он иллюстрирует как рассчитать координаты пикселя-донора из которого мы хотим брать цвет
 //                 currentQuality = estimateQuality(image, j, i, ny, nx, 5, 5); // эта функция (создайте ее) считает насколько похож квадрат 5х5 приложенный центром к (i, j)
 //                                                                                                                                         // на квадрат 5х5 приложенный центром к (nx, ny)
@@ -126,9 +126,12 @@ void run(int caseNumber, std::string caseName) {
                  bool goodPoint = false;
                  while (!goodPoint){
                      goodPoint = true;
-                     randomDonor = cv::Point(random.next(3, image.rows - 2), random.next(3, image.cols - 2));
+                     randomDonor = cv::Point(random.next(3, image.cols - 3), random.next(3, image.rows - 3));
                      for (int a = - height / 2; a <= height / 2; a++){
                          for (int b = - width / 2; b <= width / 2; b++){
+                             rassert(randomDonor.y + a >= 0 && randomDonor.y + a < image.rows, 38459326492);
+                             rassert(randomDonor.x + b >= 0 && randomDonor.x + b < image.cols, 38459326492);
+
                              if (mask.at<cv::Vec3b>(randomDonor.y + a, randomDonor.x + b) == cv::Vec3b(255, 255, 255))
                                  goodPoint = false;
                          }
@@ -144,7 +147,7 @@ void run(int caseNumber, std::string caseName) {
                  //
 
                  if (randomQuality < currentQuality) {
-                     shifts.at<cv::Vec2i>(j, i) = (ry, rx);
+                     shifts.at<cv::Vec2i>(j, i) = cv::Vec2i(ry, rx);
                      image.at<cv::Vec3b>(j, i) = image.at<cv::Vec3b>(randomDonor.y, randomDonor.x);
                  } else {
                      image.at<cv::Vec3b>(j, i) = image.at<cv::Vec3b>(donor.y, donor.x);
@@ -160,7 +163,7 @@ void run(int caseNumber, std::string caseName) {
              }
          }
          if (n % 10 == 0){
-            cv::imwrite(resultsDir + std::to_string(n / 100 + 1) + "_cleaned.png", image);
+            cv::imwrite(resultsDir + std::to_string(n / 10 + 1) + "_cleaned.png", image);
          }
      }
 
@@ -174,12 +177,12 @@ void run(int caseNumber, std::string caseName) {
 
 int main() {
     try {
-        run(1, "mic");
+//        run(1, "mic");
         // TODO протестируйте остальные случаи:
 //        run(2, "flowers");
 //        run(3, "baloons");
 //        run(4, "brickwall");
-//        run(5, "old_photo");
+        run(5, "old_photo");
 //        run(6, "your_data"); // TODO придумайте свой случай для тестирования (рекомендуется не очень большое разрешение, например 300х300)
 
         return 0;
