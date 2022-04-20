@@ -9,7 +9,7 @@
 #include <iostream>
 #include <filesystem>
 #include <memory>
-
+#include "math.h"
 #include <libutils/rasserts.h>
 #include <libutils/fast_random.h>
 
@@ -118,7 +118,7 @@ void run(int caseNumber, std::string caseName) {
 //                 int (nx, ny) = (i + dxy.x, j + dxy.y); // ЭТО НЕ КОРРЕКТНЫЙ КОД, но он иллюстрирует как рассчитать координаты пикселя-донора из которого мы хотим брать цвет
 //                 currentQuality = estimateQuality(image, j, i, ny, nx, 5, 5); // эта функция (создайте ее) считает насколько похож квадрат 5х5 приложенный центром к (i, j)
 //                                                                                                                                         // на квадрат 5х5 приложенный центром к (nx, ny)
-                 int height = 5; int width = 5;
+                 int height = 21; int width = 21;
                  double currentQuality = estimateQuality(mask, image, j, i, donor.y, donor.x, height, width);
 
 
@@ -126,7 +126,7 @@ void run(int caseNumber, std::string caseName) {
                  bool goodPoint = false;
                  while (!goodPoint){
                      goodPoint = true;
-                     randomDonor = cv::Point(random.next(3, image.cols - 3), random.next(3, image.rows - 3));
+                     randomDonor = cv::Point(random.next(width/2+1, image.cols - width/2-1), random.next(height/2+1, image.rows - height/2-1));
                      for (int a = - height / 2; a <= height / 2; a++){
                          for (int b = - width / 2; b <= width / 2; b++){
                              rassert(randomDonor.y + a >= 0 && randomDonor.y + a < image.rows, 38459326492);
@@ -137,7 +137,7 @@ void run(int caseNumber, std::string caseName) {
                          }
                      }
                  }
-                 double randomQuality = estimateQuality(mask, image, j, i, randomDonor.y, randomDonor.x, 5, 5);
+                 double randomQuality = estimateQuality(mask, image, j, i, randomDonor.y, randomDonor.x, height, width);
                  int rx = i - randomDonor.x;
                  int ry = j - randomDonor.y;
 
@@ -162,7 +162,7 @@ void run(int caseNumber, std::string caseName) {
 
              }
          }
-         if (n % 10 == 0){
+         if (n % 100 == 0){
             cv::imwrite(resultsDir + std::to_string(n / 10 + 1) + "_cleaned.png", image);
          }
      }
@@ -177,12 +177,12 @@ void run(int caseNumber, std::string caseName) {
 
 int main() {
     try {
-//        run(1, "mic");
+        run(1, "mic");
         // TODO протестируйте остальные случаи:
 //        run(2, "flowers");
 //        run(3, "baloons");
 //        run(4, "brickwall");
-        run(5, "old_photo");
+//        run(5, "old_photo");
 //        run(6, "your_data"); // TODO придумайте свой случай для тестирования (рекомендуется не очень большое разрешение, например 300х300)
 
         return 0;
