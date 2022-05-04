@@ -256,55 +256,11 @@ void test3Top2ElementSearch() {
     std::cout << "______________________________________________" << std::endl;
 }
 
-// _____________________________________________________________________________________________________________________
-// Эксперимент 4: придумайте код который позволит вам экспериментально выяснить как распределяются индексы цикла по потокам
-void test4HowWorkloadIsBalanced() {
-    std::cout << "Test 4: how workload is balanced..." << std::endl;
-    // TODO придумайте код который позволит вам экспериментально выяснить как распределяются индексы цикла по потокам
-    std::vector<std::vector<double>> indTable;
 
-    int n = 100*1000*1000;
-    int threadsN = 0;
-    #pragma omp parallel // ЗДЕСЬ НЕТ for, но есть parallel = говорим что эту секцию хочется запустить для каждого потока процессора
-    {
-        int threadId = -1;
-        #pragma omp critical // в критической секции рассчитаемся по номерам потоков и выведем в консоль что такой-то поток был запущен
-        {
-            threadId = threadsN;
-//            std::cout << "Thread #" << threadId << " started..." << std::endl;
-            ++threadsN;
-        }
-        long long threadSum = 0;
-        double threadCount = 0;
-        #pragma omp for // ЗДЕСЬ НЕТ parallel, т.к. это ключевое слово говорит "запускай потоки", но потоки уже запущены,
-        for (int i = 0; i < n; ++i) {
-            threadSum += i;
-            threadCount+=1;
-        }
-        #pragma omp critical
-        {
-            double thread_average_index = ceil(((threadSum/threadCount)/n) * 1000.0) / 1000.0;
-//            std::cout << "Thread #" << threadId << " finished!" << std::endl;
-            std::vector<double> a;
-            a.push_back(threadId);
-            a.push_back(thread_average_index);
-            indTable.push_back(a);
-        }
-    }
 
-    int p = 0;
-    bool notFinished = true;
-    while(notFinished){
-        notFinished = false;
-        for(std::vector<double> i: indTable){
-            if (i[0] == p){
-                notFinished = true;
-                std::cout << "Thread #" << i[0] << " average index (0-1): " << i[1] <<std::endl;
-                p++;
-            }
-        }
-    }
-}
+
+
+
 
 int main() {
     try {
@@ -314,10 +270,10 @@ int main() {
         std::cout << "CPU on this computer has " << nthreads << " virtual threads" << std::endl;
         std::cout << "______________________________________________" << std::endl;
 
-                test1PerElementProcessing();
-                test2TotalSum();
-                test3Top2ElementSearch();
-        test4HowWorkloadIsBalanced();
+            test1PerElementProcessing();
+            test2TotalSum();
+            test3Top2ElementSearch();
+//            test4HowWorkloadIsBalanced();
 
         return 0;
     } catch (const std::exception &e) {
